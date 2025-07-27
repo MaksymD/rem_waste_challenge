@@ -43,7 +43,7 @@ jobs:
 
       # Step 6: Run Playwright tests
       - name: Run Playwright tests
-        run: npx playwright test --output=playwright-results --reporter=html,json,list
+        run: npx playwright test
 
       # Step 7: Upload the consolidated Playwright test results as an artifact
       - name: Upload Playwright test results artifact
