@@ -1,4 +1,5 @@
-import { defineConfig, devices } from '@playwright/test';
+import {defineConfig, devices} from '@playwright/test';
+require("dotenv").config();
 
 /**
  * Read environment variables from file.
@@ -12,49 +13,64 @@ import { defineConfig, devices } from '@playwright/test';
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  testDir: './tests/e2e',
-  /* Run tests in files in parallel */
-  fullyParallel: true,
-  /* Fail the build on CI if you accidentally left test.only in the source code. */
-  forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+    testDir: './tests/e2e',
+    /* Run tests in files in parallel */
+    fullyParallel: false,
+    /* Fail the build on CI if you accidentally left test.only in the source code. */
+    forbidOnly: !!process.env.CI,
+    /* Retry on CI only */
+    retries: process.env.CI ? 2 : 0,
+    /* Opt out of parallel tests on CI. */
+    workers: process.env.CI ? 1 : undefined,
 
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [
-    ['html', { outputFolder: 'playwright-results/html-report' }],
-    ['json', { outputFile: 'playwright-results/report.json' }],
-    ['list'],
-  ],
+    /* Reporter to use. See https://playwright.dev/docs/test-reporters */
+    reporter: [
+        ['html', {outputFolder: 'playwright-results/html-report'}],
+        ['json', {outputFile: 'playwright-results/report.json'}],
+        ['list'],
+    ],
 
-  outputDir: 'playwright-results',
+    outputDir: 'playwright-results',
 
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
-  use: {
-    /* Base URL to use in actions like `await page.goto('/')`. */
+    /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+    use: {
+        headless: false,
+        /* Base URL to use in actions like `await page.goto('/')`. */
 
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
-    screenshot: 'only-on-failure',
-  },
-
-  /* Configure projects for major browsers */
-  projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+        /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
+        trace: 'on-first-retry',
+        screenshot: 'only-on-failure',
     },
 
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
+    /* Configure projects for major browsers */
+    projects: [
+        {name: "setup", testMatch: new RegExp(`.*.${process.env.STAGE}.setup.ts`)},
 
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
-  ],
+        {
+            name: 'chromium',
+            use: {
+                ...devices['Desktop Chrome'],
+                storageState: process.env.COOKIE_BASE_PATH,
+            },
+            dependencies: ["setup"],
+        },
+
+        {
+            name: 'firefox',
+            use: {
+                ...devices['Desktop Chrome'],
+                storageState: process.env.COOKIE_BASE_PATH,
+            },
+            dependencies: ["setup"],
+        },
+
+        {
+            name: 'webkit',
+            use: {
+                ...devices['Desktop Chrome'],
+                storageState: process.env.COOKIE_BASE_PATH,
+            },
+            dependencies: ["setup"],
+        },
+    ],
 });
