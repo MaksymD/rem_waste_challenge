@@ -16,7 +16,7 @@ test.describe("Welcome Page", () => {
 
     test('welcome page check header menu', async ({page}) => {
 
-        //await expect(page.getByTestId('welcome-message')).toContainText(`Welcome, ${USERS.DEV.TEST_USER.name}!`);
+        await expect(page.getByTestId('welcome-message')).toContainText(`Welcome, ${USERS.DEV.TEST_USER.name}!`);
         await expect(page.getByTestId('logout-button')).toBeVisible();
         await expect(page.getByTestId('items-section')).toBeVisible();
     });
