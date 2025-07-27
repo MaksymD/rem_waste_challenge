@@ -1,27 +1,55 @@
 name: Playwright Tests
+
 on:
   push:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+
+  workflow_dispatch:
+
 jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-    - name: Install dependencies
-      run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
-    - name: Run Playwright tests
-      run: npx playwright test
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+      # Step 1: Checkout the repository code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      # Step 3: Cache Node.js modules to speed up subsequent runs
+      - name: Cache Node.js modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # Step 4: Install project dependencies
+      - name: Install dependencies
+        run: npm ci
+
+      # Step 5: Install Playwright browsers (Chromium, Firefox, WebKit)
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      # Step 6: Run Playwright tests
+      - name: Run Playwright tests
+        run: npx playwright test --output=playwright-results --reporter=html,json,list
+
+      # Step 7: Upload the consolidated Playwright test results as an artifact
+      - name: Upload Playwright test results artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-test-results
+          path: playwright-results/
+          retention-days: 30
