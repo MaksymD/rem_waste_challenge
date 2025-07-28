@@ -3,6 +3,8 @@ import {COOKIE_PATHS} from "./constrants/COOKIE_PATHS";
 
 require("dotenv").config();
 
+const isHeadless = false;
+
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
@@ -38,6 +40,12 @@ export default defineConfig({
         /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
         trace: 'on-first-retry',
         screenshot: 'only-on-failure',
+        video: "retain-on-failure",
+        navigationTimeout: 200 * 1000,
+        launchOptions: {
+            args: ["--start-maximized"],
+        },
+        viewport: isHeadless ? {width: 1920, height: 1080} : null,
     },
 
     /* Configure projects for major browsers */
@@ -78,6 +86,8 @@ export default defineConfig({
             use: {
                 ...devices['Desktop Chrome'],
                 storageState: COOKIE_PATHS.DEV_TEST_USER_NAME,
+                viewport: isHeadless ? {width: 1920, height: 1080} : null,
+                deviceScaleFactor: undefined,
             },
             dependencies: ["setup"],
             testMatch: process.env.TEST_RUN_LIST,
@@ -89,6 +99,11 @@ export default defineConfig({
         //     use: {
         //         ...devices['Desktop Firefox'],
         //         storageState:  COOKIE_PATHS.DEV_TEST_USER_NAME,
+        //         viewport: { width: 1920, height: 1080 },
+        //         deviceScaleFactor: undefined,
+        //         launchOptions: {
+        //             args: ['--start-maximized'],
+        //         },
         //     },
         //     dependencies: ["setup"],
         //     testMatch: process.env.TEST_RUN_LIST,
@@ -100,6 +115,11 @@ export default defineConfig({
         //     use: {
         //         ...devices['Desktop Safari'],
         //         storageState:  COOKIE_PATHS.DEV_TEST_USER_NAME,
+        //         viewport: { width: 1920, height: 1080 },
+        //         deviceScaleFactor: undefined,
+        //         launchOptions: {
+        //             args: ['--start-maximized'],
+        //         },
         //     },
         //     dependencies: ["setup"],
         //     testMatch: process.env.TEST_RUN_LIST,

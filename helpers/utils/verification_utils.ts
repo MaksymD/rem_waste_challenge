@@ -99,10 +99,21 @@ async function verifyRequiredFieldValidationMessage(inputLocator: Locator): Prom
     expect(message).toMatch(expected.validationMessageRegex);
 }
 
+/**
+ * Verifies that the global application message element contains the expected text.
+ * Assumes the app message element has data-testid="app-message".
+ * @param page The Playwright Page object.
+ * @param expectedText The text expected to be contained within the app message.
+ */
+async function verifyAppMessageContainsText(page: Page, expectedText: string): Promise<void> {
+    await expect(page.getByTestId('app-message')).toContainText(expectedText);
+}
+
 export const VERIFY_UTILS = {
     verifyIsHiddenById,
     verifyIsVisibleById,
     verifyIsEnabledById,
     verifyIsVisibleAndEnabledById,
     verifyRequiredFieldValidationMessage,
+    verifyAppMessageContainsText,
 };
