@@ -93,36 +93,36 @@ export default defineConfig({
             testMatch: process.env.TEST_RUN_LIST,
         },
 
-        // {
-        //     name: 'authenticated - firefox',
-        //     testIgnore: process.env.TEST_UNAUTHENTICATED_LIST,
-        //     use: {
-        //         ...devices['Desktop Firefox'],
-        //         storageState:  COOKIE_PATHS.DEV_TEST_USER_NAME,
-        //         viewport: { width: 1920, height: 1080 },
-        //         deviceScaleFactor: undefined,
-        //         launchOptions: {
-        //             args: ['--start-maximized'],
-        //         },
-        //     },
-        //     dependencies: ["setup"],
-        //     testMatch: process.env.TEST_RUN_LIST,
-        // },
-        //
-        // {
-        //     name: 'authenticated - webkit',
-        //     testIgnore: process.env.TEST_UNAUTHENTICATED_LIST,
-        //     use: {
-        //         ...devices['Desktop Safari'],
-        //         storageState:  COOKIE_PATHS.DEV_TEST_USER_NAME,
-        //         viewport: { width: 1920, height: 1080 },
-        //         deviceScaleFactor: undefined,
-        //         launchOptions: {
-        //             args: ['--start-maximized'],
-        //         },
-        //     },
-        //     dependencies: ["setup"],
-        //     testMatch: process.env.TEST_RUN_LIST,
-        // },
+        {
+            name: 'authenticated - firefox',
+            testIgnore: process.env.TEST_UNAUTHENTICATED_LIST,
+            use: {
+                ...devices['Desktop Firefox'],
+                storageState: COOKIE_PATHS.DEV_TEST_USER_NAME,
+                viewport: {width: 1920, height: 1080},
+                deviceScaleFactor: undefined,
+                launchOptions: {
+                    args: ['--start-maximized'],
+                },
+            },
+            dependencies: ["setup"],
+            testMatch: process.env.TEST_RUN_LIST,
+        },
+
+        {
+            name: 'authenticated - webkit',
+            testIgnore: process.env.TEST_UNAUTHENTICATED_LIST,
+            use: {
+                ...devices['Desktop Safari'],
+                storageState: COOKIE_PATHS.DEV_TEST_USER_NAME,
+                viewport: {width: 1920, height: 1080},
+                deviceScaleFactor: undefined,
+                launchOptions: {
+                    args: ['--start-maximized'],
+                },
+            },
+            dependencies: ["setup"],
+            testMatch: process.env.TEST_RUN_LIST,
+        },
     ],
 });
