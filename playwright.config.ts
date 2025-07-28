@@ -31,7 +31,7 @@ export default defineConfig({
         ['list'],
     ],
 
-    outputDir: 'playwright-results',
+    outputDir: 'playwright-results/artifacts',
 
     /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
     use: {
