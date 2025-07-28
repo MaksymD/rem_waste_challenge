@@ -1,7 +1,8 @@
-import { Page } from "@playwright/test";
-import { VERIFY_UTILS } from "../utils/verificationUtils";
+import {Page} from "@playwright/test";
+import {VERIFY_UTILS} from "../utils/verification_utils";
 
 const BUTTON_LOGIN = "login-button";
+const BUTTON_LOGOUT = "logout-button";
 
 /**
  * Generic function to verify that a button is visible, enabled, and then click it.
@@ -20,7 +21,8 @@ async function clickButton(page: Page, testId: string, timeout = 5000): Promise<
 
 export const BUTTON_GROUP = {
   clickButton,
-  LOGIN: {
+  MAIN: {
     BUTTON_LOGIN,
+    BUTTON_LOGOUT,
   },
 };

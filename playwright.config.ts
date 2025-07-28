@@ -1,4 +1,5 @@
 import {defineConfig, devices} from '@playwright/test';
+import {COOKIE_PATHS} from "./constrants/COOKIE_PATHS";
 
 require("dotenv").config();
 
@@ -22,7 +23,7 @@ export default defineConfig({
 
     /* Reporter to use. See https://playwright.dev/docs/test-reporters */
     reporter: [
-        ['html', {outputFolder: 'playwright-results/html-report'}],
+        ['html'],
         ['json', {outputFile: 'playwright-results/report.json'}],
         ['list'],
     ],
@@ -50,30 +51,58 @@ export default defineConfig({
         },
 
         {
-            name: 'chromium',
+            name: 'unauthenticated - chromium ',
+            testMatch: process.env.TEST_UNAUTHENTICATED_LIST,
             use: {
                 ...devices['Desktop Chrome'],
-                storageState: process.env.COOKIE_BASE_PATH,
             },
-            dependencies: ["setup"],
+        },
+        {
+            name: 'unauthenticated - firefox ',
+            testMatch: process.env.TEST_UNAUTHENTICATED_LIST,
+            use: {
+                ...devices['Desktop Firefox'],
+            },
+        },
+        {
+            name: 'unauthenticated - webkit ',
+            testMatch: process.env.TEST_UNAUTHENTICATED_LIST,
+            use: {
+                ...devices['Desktop Safari'],
+            },
         },
 
         {
-            name: 'firefox',
+            name: 'authenticated - chromium',
+            testIgnore: process.env.TEST_UNAUTHENTICATED_LIST,
             use: {
                 ...devices['Desktop Chrome'],
-                storageState: process.env.COOKIE_BASE_PATH,
+                storageState: COOKIE_PATHS.DEV_TEST_USER_NAME,
             },
             dependencies: ["setup"],
+            testMatch: process.env.TEST_RUN_LIST,
         },
 
-        {
-            name: 'webkit',
-            use: {
-                ...devices['Desktop Chrome'],
-                storageState: process.env.COOKIE_BASE_PATH,
-            },
-            dependencies: ["setup"],
-        },
+        // {
+        //     name: 'authenticated - firefox',
+        //     testIgnore: process.env.TEST_UNAUTHENTICATED_LIST,
+        //     use: {
+        //         ...devices['Desktop Firefox'],
+        //         storageState:  COOKIE_PATHS.DEV_TEST_USER_NAME,
+        //     },
+        //     dependencies: ["setup"],
+        //     testMatch: process.env.TEST_RUN_LIST,
+        // },
+        //
+        // {
+        //     name: 'authenticated - webkit',
+        //     testIgnore: process.env.TEST_UNAUTHENTICATED_LIST,
+        //     use: {
+        //         ...devices['Desktop Safari'],
+        //         storageState:  COOKIE_PATHS.DEV_TEST_USER_NAME,
+        //     },
+        //     dependencies: ["setup"],
+        //     testMatch: process.env.TEST_RUN_LIST,
+        // },
     ],
 });

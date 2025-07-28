@@ -1,5 +1,5 @@
-import { Page } from "@playwright/test";
-import {VERIFY_UTILS} from "./verificationUtils";
+import {Page} from "@playwright/test";
+import {VERIFY_UTILS} from "./verification_utils";
 
 /**
  * Fills a text field if a value is provided.
