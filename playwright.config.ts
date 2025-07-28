@@ -115,11 +115,6 @@ export default defineConfig({
             use: {
                 ...devices['Desktop Safari'],
                 storageState: COOKIE_PATHS.DEV_TEST_USER_NAME,
-                viewport: {width: 1920, height: 1080},
-                deviceScaleFactor: undefined,
-                launchOptions: {
-                    args: ['--start-maximized'],
-                },
             },
             dependencies: ["setup"],
             testMatch: process.env.TEST_RUN_LIST,
