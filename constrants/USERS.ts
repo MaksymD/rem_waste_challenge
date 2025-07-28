@@ -1,11 +1,11 @@
 type User = {
-  name: string;
-  password: string;
+    name: string;
+    password: string;
 };
 
 const TEST_USER: User = {
-  name: process.env.DEV_TEST_USER_NAME,
-  password: process.env.DEV_TEST_USER_PASSWORD,
+    name: process.env.DEV_TEST_USER_NAME,
+    password: process.env.DEV_TEST_USER_PASSWORD,
 };
 const FAKE_USER: User = {
     name: process.env.DEV_FAKE_USER_NAME,
@@ -13,9 +13,9 @@ const FAKE_USER: User = {
 };
 
 export const USERS: { [key: string]: { [key: string]: User } } = {
-  DEV: {
-    TEST_USER,
-      FAKE_USER,
-  },
+    DEV: {
+        TEST_USER,
+        FAKE_USER,
+    },
 };
-export type { User };
+export type {User};

@@ -4,6 +4,8 @@ import {COOKIE_PATHS} from "./constrants/COOKIE_PATHS";
 require("dotenv").config();
 
 const isHeadless = false;
+const testDirE2E = './tests/e2e';
+const testDirAPI = './tests/api';
 
 /**
  * Read environment variables from file.
@@ -17,7 +19,6 @@ const isHeadless = false;
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-    testDir: './tests/e2e',
     fullyParallel: false,
     forbidOnly: !!process.env.CI,
     retries: process.env.CI ? 2 : 0,
@@ -49,6 +50,7 @@ export default defineConfig({
     projects: [
         {
             name: "setup",
+            testDir: testDirE2E,
             testMatch: new RegExp(`.*.${process.env.STAGE}.setup.ts`),
             use: {
                 headless: true,
@@ -56,7 +58,17 @@ export default defineConfig({
         },
 
         {
+            name: 'api-tests',
+            testDir: testDirAPI,
+            testMatch: '**/*.spec.ts',
+            use: {
+                ...devices['Desktop Chrome'],
+            },
+        },
+
+        {
             name: 'unauthenticated - chromium ',
+            testDir: testDirE2E,
             testMatch: process.env.TEST_UNAUTHENTICATED_LIST,
             use: {
                 ...devices['Desktop Chrome'],
@@ -64,6 +76,7 @@ export default defineConfig({
         },
         {
             name: 'unauthenticated - firefox ',
+            testDir: testDirE2E,
             testMatch: process.env.TEST_UNAUTHENTICATED_LIST,
             use: {
                 ...devices['Desktop Firefox'],
@@ -71,6 +84,7 @@ export default defineConfig({
         },
         {
             name: 'unauthenticated - webkit ',
+            testDir: testDirE2E,
             testMatch: process.env.TEST_UNAUTHENTICATED_LIST,
             use: {
                 ...devices['Desktop Safari'],
@@ -79,6 +93,7 @@ export default defineConfig({
 
         {
             name: 'authenticated - chromium',
+            testDir: testDirE2E,
             testIgnore: process.env.TEST_UNAUTHENTICATED_LIST,
             use: {
                 ...devices['Desktop Chrome'],
@@ -92,6 +107,7 @@ export default defineConfig({
 
         {
             name: 'authenticated - firefox',
+            testDir: testDirE2E,
             testIgnore: process.env.TEST_UNAUTHENTICATED_LIST,
             use: {
                 ...devices['Desktop Firefox'],
@@ -108,6 +124,7 @@ export default defineConfig({
 
         {
             name: 'authenticated - webkit',
+            testDir: testDirE2E,
             testIgnore: process.env.TEST_UNAUTHENTICATED_LIST,
             use: {
                 ...devices['Desktop Safari'],
