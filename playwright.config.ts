@@ -42,9 +42,6 @@ export default defineConfig({
         screenshot: 'only-on-failure',
         video: "retain-on-failure",
         navigationTimeout: 200 * 1000,
-        launchOptions: {
-            args: ["--start-maximized"],
-        },
         viewport: isHeadless ? {width: 1920, height: 1080} : null,
     },
 
