@@ -10,7 +10,7 @@ const HEADERS = {
 /**
  * Creates a new Object via POST request.
  * @param request The Playwright API request context.
- * @param objectType The type of object (e.g., 'login', 'items').
+ * @param objectType The type of object.
  * @param requestBody The data to send in the request body.
  * @param token Optional JWT token for authorization.
  * @returns An object containing the Playwright Response object and the parsed JSON data.
@@ -30,7 +30,7 @@ async function postObject<T>(request: APIRequestContext, objectType: string, req
 /**
  * Retrieves an Object or list of Objects via GET request.
  * @param request The Playwright API request context.
- * @param objectType The type of object (e.g., 'items').
+ * @param objectType The type of object.
  * @param id Optional ID for a specific object.
  * @param token Optional JWT token for authorization.
  * @returns An object containing the Playwright Response object and the parsed JSON data.
@@ -48,7 +48,7 @@ async function getObject(request: APIRequestContext, objectType: string, id?: st
 /**
  * Updates an existing Object via PUT request.
  * @param request The Playwright API request context.
- * @param objectType The type of object (e.g., 'items').
+ * @param objectType The type of object.
  * @param id The ID of the object to update.
  * @param requestBody The data to send in the request body.
  * @param token Optional JWT token for authorization.
@@ -69,7 +69,7 @@ async function putObject<T>(request: APIRequestContext, objectType: string, id: 
 /**
  * Deletes an Object via DELETE request.
  * @param request The Playwright API request context.
- * @param objectType The type of object (e.g., 'items').
+ * @param objectType The type of object.
  * @param id The ID of the object to delete.
  * @param token Optional JWT token for authorization.
  * @returns An object containing the Playwright Response object and the parsed JSON data.

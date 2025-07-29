@@ -1,9 +1,12 @@
-import {expect, test} from '@playwright/test';
+import {expect} from '@playwright/test';
 import {USERS} from "../../constrants/USERS";
+import {test} from "../../test";
 import {API} from "../../helpers/api/api";
 
 test.describe.serial('API Tests', () => {
     let authToken: string;
+    let itemsToCleanup: { id: number; name: string }[] = [];
+    const uniqueId = Date.now().toString().slice(-6);
 
     test.beforeAll(async ({request}) => {
         console.log(`Attempting to log in to: ${process.env.BACKEND_URL}/login`);
@@ -16,6 +19,34 @@ test.describe.serial('API Tests', () => {
         authToken = data.token;
         expect(authToken).toBeDefined();
         console.log(`Authenticated with token: ${authToken.substring(0, 10)}...`);
+    });
+
+    test.afterAll(async ({request}, testInfo) => {
+        for (const item of itemsToCleanup) {
+            try {
+                const {response} = await API.deleteObject(request, 'items', item.id, authToken);
+                if (response.ok()) {
+                    await testInfo.attach(`Cleanup: Item ${item.id}`, {
+                        body: `Item with ID: ${item.id} (Name: "${item.name}") deleted successfully.`,
+                        contentType: "text/plain",
+                    });
+                } else {
+                    const errorBody = await response.text();
+                    console.error(`Failed to delete item ${item.id} in afterAll. Status: ${response.status()}, Body: ${errorBody}`);
+                    await testInfo.attach(`Cleanup Failed: Item ${item.id}`, {
+                        body: `Failed to delete item ${item.id} (Name: "${item.name}"). Status: ${response.status()}, Body: ${errorBody}`,
+                        contentType: "text/plain",
+                    });
+                }
+            } catch (error) {
+                console.error(`Error during afterAll cleanup for item ${item.id}:`, error);
+                await testInfo.attach(`Cleanup Error: Item ${item.id}`, {
+                    body: `Error during cleanup for item ${item.id} (Name: "${item.name}"): ${error.message}`,
+                    contentType: "text/plain",
+                });
+            }
+        }
+        itemsToCleanup = [];
     });
 
     test('( ✅ Positive test ) - POST /login → should allow successful login with valid credentials', async ({request}) => {
@@ -50,16 +81,16 @@ test.describe.serial('API Tests', () => {
     });
 
     test('( ✅ Positive test ) - POST /items → should create a new item for an authenticated user', async ({request}) => {
-        const timestamp = Date.now();
         const newItem = {
-            name: `API Test New Item ${timestamp}`,
-            description: `Description for API Test New Item ${timestamp}`,
+            name: `API Test New Item ${uniqueId}`,
+            description: `Description for API Test New Item ${uniqueId}`,
         };
         const {response, data} = await API.postObject(request, 'items', newItem, authToken);
         expect(response.status()).toBe(201);
         expect(data.message).toBe('Item created successfully');
         expect(data.item).toMatchObject(newItem);
         expect(data.item.id).toBeDefined();
+        itemsToCleanup.push({id: data.item.id, name: data.item.name});
     });
 
     test('( ❌ Negative test ) - POST /items → should return 400 for missing data (authenticated)', async ({request}) => {
@@ -81,16 +112,19 @@ test.describe.serial('API Tests', () => {
     });
 
     test('( ✅ Positive test ) - PUT /items/:id → should update an existing item for an authenticated user', async ({request}) => {
-        const timestamp = Date.now();
-        const itemToCreate = {name: `Original Item ${timestamp}`, description: `Original Description ${timestamp}`};
+        const itemToCreate = {
+            name: `Original Item ${uniqueId}`,
+            description: `Original Description ${uniqueId}`
+        };
         const {
             response: createResponse,
             data: createData
         } = await API.postObject(request, 'items', itemToCreate, authToken);
         expect(createResponse.status()).toBe(201);
         const createdItem = createData.item;
+        itemsToCleanup.push({id: createdItem.id, name: createdItem.name});
 
-        const updatedData = {name: `Updated Item ${timestamp}`, description: `Updated Description ${timestamp}`};
+        const updatedData = {name: `Updated Item ${uniqueId}`, description: `Updated Description ${uniqueId}`};
         const {response, data} = await API.putObject(request, 'items', createdItem.id, updatedData, authToken);
         expect(response.ok()).toBeTruthy();
         expect(data.message).toBe('Item updated successfully');
@@ -110,10 +144,9 @@ test.describe.serial('API Tests', () => {
     });
 
     test('( ❌ Negative test ) - PUT /items/:id → should return 400 for no data provided for update (authenticated)', async ({request}) => {
-        const timestamp = Date.now();
         const itemToCreate = {
-            name: `No Data Update Item ${timestamp}`,
-            description: `No Data Update Description ${timestamp}`
+            name: `No Data Update Item ${uniqueId}`,
+            description: `No Data Update Description ${uniqueId}`
         };
         const {
             response: createResponse,
@@ -121,6 +154,7 @@ test.describe.serial('API Tests', () => {
         } = await API.postObject(request, 'items', itemToCreate, authToken);
         expect(createResponse.status()).toBe(201);
         const createdItem = createData.item;
+        itemsToCleanup.push({id: createdItem.id, name: createdItem.name});
         const {response, data} = await API.putObject(request, 'items', createdItem.id, {}, authToken);
         expect(response.status()).toBe(400);
         expect(data.message).toBe('No data provided for update');
@@ -133,8 +167,7 @@ test.describe.serial('API Tests', () => {
     });
 
     test('( ✅ Positive test ) - DELETE /items/:id → should delete an existing item for an authenticated user', async ({request}) => {
-        const timestamp = Date.now();
-        const itemToCreate = {name: `Delete Me Item ${timestamp}`, description: `Delete Me Description ${timestamp}`};
+        const itemToCreate = {name: `Delete Me Item ${uniqueId}`, description: `Delete Me Description ${uniqueId}`};
         const {
             response: createResponse,
             data: createData
