@@ -1,6 +1,74 @@
 import {expect, Locator, Page} from "@playwright/test";
 
 /**
+ * Verifies that a given locator (or its indexed position) is visible within a timeout.
+ *
+ * @param locator - The Playwright locator to check.
+ * @param {Object} [options] - Additional options.
+ * @param {number} [options.timeout=10000] - Timeout in milliseconds.
+ * @param {"first" | "last" | number} [options.position] - Choose specific element: "first", "last", or index.
+ * @returns {Promise<void>} Resolves if the element is visible, otherwise throws with context.
+ */
+export async function verifyIsVisibleByLocator(
+    locator: Locator,
+    options: { timeout?: number; position?: "first" | "last" | number } = {}
+): Promise<void> {
+    const {timeout = 10000, position} = options;
+    let finalLocator = locator;
+
+    if (position === "first") {
+        finalLocator = locator.first();
+    } else if (position === "last") {
+        finalLocator = locator.last();
+    } else if (typeof position === "number") {
+        finalLocator = locator.nth(position);
+    }
+
+    await finalLocator.scrollIntoViewIfNeeded();
+
+    try {
+        await expect(finalLocator).toBeVisible({timeout});
+    } catch (err) {
+        throw new Error(
+            `❌ Locator${position !== undefined ? ` (position: ${position})` : ""} is not visible within ${timeout}ms.`
+        );
+    }
+}
+
+/**
+ * Verifies that a given locator (or its indexed position) is NOT visible within a timeout.
+ *
+ * @param locator - The Playwright locator to check.
+ * @param {Object} [options] - Additional options.
+ * @param {number} [options.timeout=10000] - Timeout in milliseconds.
+ * @param {"first" | "last" | number} [options.position] - Choose specific element: "first", "last", or index.
+ * @returns {Promise<void>} Resolves if the element is not visible, otherwise throws with context.
+ */
+export async function verifyIsNotVisibleByLocator(
+    locator: Locator,
+    options: { timeout?: number; position?: "first" | "last" | number } = {}
+): Promise<void> {
+    const {timeout = 10000, position} = options;
+    let finalLocator = locator;
+
+    if (position === "first") {
+        finalLocator = locator.first();
+    } else if (position === "last") {
+        finalLocator = locator.last();
+    } else if (typeof position === "number") {
+        finalLocator = locator.nth(position);
+    }
+
+    try {
+        await expect(finalLocator).not.toBeVisible({timeout});
+    } catch (err) {
+        throw new Error(
+            `❌ Locator${position !== undefined ? ` (position: ${position})` : ""} was unexpectedly visible within ${timeout}ms.`
+        );
+    }
+}
+
+/**
  * Generic function to verify that an element is hidden.
  *
  * @param {Page} page - The Playwright page instance.
@@ -110,6 +178,8 @@ async function verifyAppMessageContainsText(page: Page, expectedText: string): P
 }
 
 export const VERIFY_UTILS = {
+    verifyIsVisibleByLocator,
+    verifyIsNotVisibleByLocator,
     verifyIsHiddenById,
     verifyIsVisibleById,
     verifyIsEnabledById,
