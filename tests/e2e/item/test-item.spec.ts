@@ -5,6 +5,7 @@ import {VERIFY_UTILS} from "../../../helpers/utils/verification_utils";
 import {MESSAGES} from "../../../helpers/text/messages";
 import {BUTTON_GROUP} from "../../../helpers/button/button_group";
 import {ITEMS} from "../../../helpers/item/items_section";
+import {FORM_UTILS} from "../../../helpers/utils/form_utils";
 
 test.describe.serial('Item Management', () => {
     test.use({storageState: COOKIE_PATHS.DEV_TEST_USER_NAME});
@@ -27,8 +28,8 @@ test.describe.serial('Item Management', () => {
         };
 
         // WHEN
-        await page.getByTestId(ITEMS.INPUT_NEW_ITEM_NAME).fill(TESTDATA_ITEM.name);
-        await page.getByTestId(ITEMS.INPUT_NEW_ITEM_DESCRIPTION).fill(TESTDATA_ITEM.description);
+        await FORM_UTILS.fillInputField(page, ITEMS.INPUT_NEW_ITEM_NAME, TESTDATA_ITEM.name);
+        await FORM_UTILS.fillInputField(page, ITEMS.INPUT_NEW_ITEM_DESCRIPTION, TESTDATA_ITEM.description);
         await Promise.all([
             BUTTON_GROUP.clickButton(page, BUTTON_GROUP.MAIN.BUTTON_ADD_ITEM),
             VERIFY_UTILS.verifyAppMessageContainsText(page, MESSAGES.SUCCESS_ITEM_ADD),
@@ -55,17 +56,14 @@ test.describe.serial('Item Management', () => {
             description: `Edited Description for ${uniqueId}`,
         };
 
-        // WHEN
         if (!testItemTestId || !testItemId) {
             throw new Error('Item IDs are not set. Ensure the creation test passed.');
         }
-        const originalItemLocator = page.locator(`li[data-testid="${testItemTestId}"]`, {
-            has: page.locator('h4', {hasText: TESTDATA_ITEM.name})
-        });
-        await VERIFY_UTILS.verifyIsVisibleByLocator(originalItemLocator);
+        // WHEN
+        await VERIFY_UTILS.verifyIsVisibleByLocator(page.locator(`li[data-testid="${testItemTestId}"]`, {has: page.locator('h4', {hasText: TESTDATA_ITEM.name})}));
         await BUTTON_GROUP.clickButtonByLocator(page.getByTestId(`edit-item-button-${testItemId}`));
-        await page.getByTestId(`edit-item-name-input-${testItemId}`).fill(TESTDATA_ITEM_EDIT.name);
-        await page.getByTestId(`edit-item-description-input-${testItemId}`).fill(TESTDATA_ITEM_EDIT.description);
+        await FORM_UTILS.fillInputField(page, `edit-item-name-input-${testItemId}`, TESTDATA_ITEM_EDIT.name);
+        await FORM_UTILS.fillInputField(page, `edit-item-description-input-${testItemId}`, TESTDATA_ITEM_EDIT.description);
         await Promise.all([
             BUTTON_GROUP.clickButtonByLocator(page.getByTestId(`save-item-button-${testItemId}`)),
             VERIFY_UTILS.verifyAppMessageContainsText(page, MESSAGES.SUCCESS_ITEM_UPDATE),
@@ -84,10 +82,10 @@ test.describe.serial('Item Management', () => {
             description: `Edited Description for ${uniqueId}`,
         };
 
-        // WHEN
         if (!testItemTestId || !testItemId) {
             throw new Error('Item IDs are not set. Ensure the creation test passed.');
         }
+        // WHEN
         await VERIFY_UTILS.verifyIsVisibleByLocator(page.locator(`li[data-testid="${testItemTestId}"]`, {has: page.locator('h4', {hasText: TESTDATA_ITEM.name})}));
         await ALERT.handleConfirmDialog(page, ALERT.TEXT.DELETE_ITEM);
         await Promise.all([
